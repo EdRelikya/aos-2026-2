@@ -14,7 +14,7 @@
     "dotenv",
     "back-end"
   ],
-  "author": "Márcio Bueno",
+  "author": "Ed",
   "license": "ISC",
   "type": "module",
   "devDependencies": {
