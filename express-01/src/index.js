@@ -21,7 +21,7 @@ app.use(contextMiddleware);
 
 // rotas
 app.get("/", (req, res) => {
-  return res.send("Servidor express exectuando...");
+  return res.send("Servidor express executando...");
 });
 app.use("/session", routes.session);
 app.use("/users", routes.user);
@@ -30,7 +30,8 @@ app.use("/messages", routes.message);
 const port = process.env.PORT || 3000;
 
 const eraseDatabaseOnSync = process.env.ERASE_DATABASE_ON_SYNC === "true";
-const syncDatabase = process.env.SYNC_DATABASE === "true" || eraseDatabaseOnSync;
+const syncDatabase =
+  process.env.SYNC_DATABASE === "true" || eraseDatabaseOnSync;
 
 const startServer = () => {
   app.listen(port, () => console.log(`Example app listening on port ${port}!`));
