@@ -2,12 +2,20 @@ import { messageService } from "../services/index.js";
 
 const getMessages = async (req, res) => {
   const messages = await messageService.getAllMessages();
-  return res.send(messages);
+  // 200 OK: Sucesso padrão para listagens
+  return res.status(200).send(messages);
 };
 
 const getMessage = async (req, res) => {
   const message = await messageService.getMessageById(req.params.messageId);
-  return res.send(message);
+  
+  // Validação importante: se a mensagem não existir, retorna 404 Not Found
+  if (!message) {
+    return res.status(404).send({ message: "Mensagem não encontrada." });
+  }
+
+  // 200 OK: Sucesso para busca de item único
+  return res.status(200).send(message);
 };
 
 const createMessage = async (req, res) => {
@@ -16,12 +24,16 @@ const createMessage = async (req, res) => {
     userId: req.context.me.id,
   });
 
-  return res.send(message);
+  // 201 Created: Sucesso específico para quando um recurso é criado no banco
+  return res.status(201).send(message);
 };
 
 const deleteMessage = async (req, res) => {
   await messageService.deleteMessage(req.params.messageId);
-  return res.send(true);
+  
+  // 204 No Content: O recurso foi deletado com sucesso e não há nada para retornar no corpo.
+  // Nota: Se usar 204, o navegador ignora o .send(true) pois não pode haver corpo.
+  return res.status(204).send();
 };
 
 export default {
