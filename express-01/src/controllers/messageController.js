@@ -28,6 +28,20 @@ const createMessage = async (req, res) => {
   return res.status(201).send(message);
 };
 
+const updateMessage = async (req, res) => {
+  const updatedMessage = await messageService.updateMessage(req.params.messageId, {
+    text: req.body.text,
+  });
+
+  // Validação: se o ID não existir, não há o que atualizar
+  if (!updatedMessage) {
+    return res.status(404).send({ message: "Mensagem não encontrada." });
+  }
+
+  // 200 OK: Sucesso para atualizações onde você retorna o objeto modificado
+  return res.status(200).send(updatedMessage);
+};
+
 const deleteMessage = async (req, res) => {
   await messageService.deleteMessage(req.params.messageId);
   
@@ -40,5 +54,6 @@ export default {
   getMessages,
   getMessage,
   createMessage,
+  updateMessage,
   deleteMessage,
 };
