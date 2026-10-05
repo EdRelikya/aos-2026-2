@@ -1,4 +1,5 @@
 import { userService } from "../services/index.js";
+import AppError from "../utils/appError.js";
 
 const getUsers = async (req, res) => {
   const users = await userService.getAllUsers();
@@ -8,10 +9,9 @@ const getUsers = async (req, res) => {
 
 const getUser = async (req, res) => {
   const user = await userService.getUserById(req.params.userId);
-  
-  // Validação: Se o ID não existir no banco, avisa o cliente
+
   if (!user) {
-    return res.status(404).send({ message: "Usuário não encontrado." }); // 404 Not Found
+    throw new AppError("Usuário não encontrado.", 404);
   }
 
   // 200 OK: Sucesso ao buscar um usuário específico
@@ -34,9 +34,8 @@ const updateUser = async (req, res) => {
     email: req.body.email,
   });
 
-  // Validação: se o ID não existir, não há o que atualizar
   if (!updatedUser) {
-    return res.status(404).send({ message: "Usuário não encontrado." });
+    throw new AppError("Usuário não encontrado.", 404);
   }
 
   // 200 OK: Sucesso para atualizações onde você retorna o objeto modificado

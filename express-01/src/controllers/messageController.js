@@ -1,4 +1,5 @@
 import { messageService } from "../services/index.js";
+import AppError from "../utils/appError.js";
 
 const getMessages = async (req, res) => {
   const messages = await messageService.getAllMessages();
@@ -8,10 +9,9 @@ const getMessages = async (req, res) => {
 
 const getMessage = async (req, res) => {
   const message = await messageService.getMessageById(req.params.messageId);
-  
-  // Validação importante: se a mensagem não existir, retorna 404 Not Found
+
   if (!message) {
-    return res.status(404).send({ message: "Mensagem não encontrada." });
+    throw new AppError("Mensagem não encontrada.", 404);
   }
 
   // 200 OK: Sucesso para busca de item único
@@ -33,9 +33,8 @@ const updateMessage = async (req, res) => {
     text: req.body.text,
   });
 
-  // Validação: se o ID não existir, não há o que atualizar
   if (!updatedMessage) {
-    return res.status(404).send({ message: "Mensagem não encontrada." });
+    throw new AppError("Mensagem não encontrada.", 404);
   }
 
   // 200 OK: Sucesso para atualizações onde você retorna o objeto modificado
@@ -44,7 +43,7 @@ const updateMessage = async (req, res) => {
 
 const deleteMessage = async (req, res) => {
   await messageService.deleteMessage(req.params.messageId);
-  
+
   // 204 No Content: O recurso foi deletado com sucesso e não há nada para retornar no corpo.
   // Nota: Se usar 204, o navegador ignora o .send(true) pois não pode haver corpo.
   return res.status(204).send();
