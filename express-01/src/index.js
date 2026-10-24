@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import helmet from "helmet";
 import models, { sequelize } from "./models/index.js";
 import {
   corsMiddleware,
@@ -14,6 +15,7 @@ const app = express();
 app.set("trust proxy", true);
 
 // middlewares
+app.use(helmet());
 app.use(corsMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
