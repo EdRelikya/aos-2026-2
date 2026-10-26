@@ -7,6 +7,7 @@ import {
   logMiddleware,
   contextMiddleware,
   errorMiddleware,
+  limiterMiddleware,
 } from "./middlewares/index.js";
 import * as routes from "./routes/index.js";
 
@@ -14,9 +15,11 @@ const app = express();
 
 app.set("trust proxy", true);
 
+
 // middlewares
 app.use(helmet());
 app.use(corsMiddleware);
+app.use(limiterMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(logMiddleware);
