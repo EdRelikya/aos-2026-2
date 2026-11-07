@@ -1,51 +1,49 @@
 import { messageService } from "../services/index.js";
-import AppError from "../utils/appError.js";
+import { AppError } from "../utils/index.js";
 
 const getMessages = async (req, res) => {
   const messages = await messageService.getAllMessages();
-  // 200 OK: Sucesso padrão para listagens
   return res.status(200).send(messages);
 };
 
 const getMessage = async (req, res) => {
   const message = await messageService.getMessageById(req.params.messageId);
-
   if (!message) {
     throw new AppError("Mensagem não encontrada.", 404);
   }
-
-  // 200 OK: Sucesso para busca de item único
   return res.status(200).send(message);
 };
 
 const createMessage = async (req, res) => {
+  if (!req.context?.me?.id) {
+    throw new AppError("Usuário não autenticado.", 401);
+  }
+
+  const { text } = req.body || {};
   const message = await messageService.createMessage({
-    text: req.body.text,
+    text,
     userId: req.context.me.id,
   });
 
-  // 201 Created: Sucesso específico para quando um recurso é criado no banco
   return res.status(201).send(message);
 };
 
 const updateMessage = async (req, res) => {
-  const updatedMessage = await messageService.updateMessage(req.params.messageId, {
-    text: req.body.text,
+  const { text } = req.body || {};
+  const message = await messageService.updateMessage(req.params.messageId, {
+    text,
   });
-
-  if (!updatedMessage) {
+  if (!message) {
     throw new AppError("Mensagem não encontrada.", 404);
   }
-
-  // 200 OK: Sucesso para atualizações onde você retorna o objeto modificado
-  return res.status(200).send(updatedMessage);
+  return res.status(200).send(message);
 };
 
 const deleteMessage = async (req, res) => {
-  await messageService.deleteMessage(req.params.messageId);
-
-  // 204 No Content: O recurso foi deletado com sucesso e não há nada para retornar no corpo.
-  // Nota: Se usar 204, o navegador ignora o .send(true) pois não pode haver corpo.
+  const isDeleted = await messageService.deleteMessage(req.params.messageId);
+  if (!isDeleted) {
+    throw new AppError("Mensagem não encontrada.", 404);
+  }
   return res.status(204).send();
 };
 

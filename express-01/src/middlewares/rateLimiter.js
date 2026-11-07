@@ -1,36 +1,24 @@
 import rateLimit from "express-rate-limit";
-import AppError from "../utils/appError.js";
+import { AppError } from "../utils/index.js";
 
-// Limite geral da API: 100 requisições por IP a cada 15 minutos
-export const limiterMiddleware = rateLimit({
-  windowMs: 15 * 60 * 1000,
+const FIFTEEN_MINUTES_MS = 15 * 60 * 1000;
+
+const createLimiter = ({ limit, message, windowMs = FIFTEEN_MINUTES_MS }) =>
+  rateLimit({
+    windowMs,
+    limit,
+    standardHeaders: "draft-7",
+    legacyHeaders: true,
+    validate: { trustProxy: false },
+    handler: (req, res, next) => next(new AppError(message, 429)),
+  });
+
+export const limiterMiddleware = createLimiter({
   limit: 100,
-  standardHeaders: "draft-7",
-  legacyHeaders: false,
-  validate: { trustProxy: false },
-  handler: (req, res, next) => {
-    next(
-      new AppError(
-        "Muitas requisições originadas deste IP. Tente novamente em 15 minutos.",
-        429,
-      ),
-    );
-  },
+  message: "Muitas requisições originadas deste IP. Tente novamente em 15 minutos.",
 });
 
-// Limite estrito para sessão/autenticação: 5 requisições por IP a cada 15 minutos
-export const authLimiterMiddleware = rateLimit({
-  windowMs: 15 * 60 * 1000,
+export const authLimiterMiddleware = createLimiter({
   limit: 5,
-  standardHeaders: "draft-7",
-  legacyHeaders: false,
-  validate: { trustProxy: false },
-  handler: (req, res, next) => {
-    next(
-      new AppError(
-        "Muitas tentativas de autenticação originadas deste IP. Tente novamente em 15 minutos.",
-        429,
-      ),
-    );
-  },
+  message: "Muitas tentativas de autenticação originadas deste IP. Tente novamente em 15 minutos.",
 });

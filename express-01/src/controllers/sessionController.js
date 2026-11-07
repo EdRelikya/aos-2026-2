@@ -1,14 +1,13 @@
 import { userService } from "../services/index.js";
+import { AppError } from "../utils/index.js";
 
 const getSession = async (req, res) => {
-  const user = await userService.getUserById(req.context.me.id);
-
-  // Validação de segurança: se o token/contexto existia mas o usuário sumiu do banco
+  const user = req.context?.me?.id
+    ? await userService.getUserById(req.context.me.id)
+    : null;
   if (!user) {
-    return res.status(401).send({ message: "Sessão inválida ou não autorizada." }); // 401 Unauthorized
+    throw new AppError("Usuário não encontrado.", 404);
   }
-
-  // 200 OK: Sucesso ao retornar os dados da sessão atual
   return res.status(200).send(user);
 };
 

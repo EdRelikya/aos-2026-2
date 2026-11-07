@@ -6,6 +6,7 @@ import {
   corsMiddleware,
   logMiddleware,
   contextMiddleware,
+  notFoundMiddleware,
   errorMiddleware,
   limiterMiddleware,
 } from "./middlewares/index.js";
@@ -13,8 +14,7 @@ import * as routes from "./routes/index.js";
 
 const app = express();
 
-app.set("trust proxy", true);
-
+app.set("trust proxy", 1);
 
 // middlewares
 app.use(helmet());
@@ -33,7 +33,10 @@ app.use("/session", routes.session);
 app.use("/users", routes.user);
 app.use("/messages", routes.message);
 
-// middleware global de erro (obrigatoriamente após todas as rotas)
+// rota não encontrada (404)
+app.use(notFoundMiddleware);
+
+// middleware global de erro
 app.use(errorMiddleware);
 
 const port = process.env.PORT || 3000;
@@ -91,3 +94,5 @@ const createUsersWithMessages = async () => {
     },
   );
 };
+
+export default app;

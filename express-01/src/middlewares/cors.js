@@ -1,27 +1,32 @@
 import cors from "cors";
+import { AppError } from "../utils/index.js";
 
-const allowedOrigins = (
-  process.env.ALLOWED_ORIGINS || "http://localhost:3000,http://localhost:3001"
-)
-  .split(",")
-  .map((origin) => origin.trim());
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(",").map((o) => o.trim())
+  : ["http://localhost:3000", "http://localhost:3001"];
 
-const corsMiddleware = cors({
-  origin: (origin, callback) => {
-    // Sem Origin: apps mobile (Expo/React Native), Postman, cURL
-    if (!origin) {
-      return callback(null, true);
-    }
+const corsOptionsDelegate = (req, callback) => {
+  const origin = req.headers.origin;
 
-    // Origem na lista permitida
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
+  // Permite requisições sem 'Origin' (Expo/React Native nativo, mobile, cURL, Postman)
+  if (!origin) {
+    return callback(null, { origin: true, credentials: true });
+  }
 
-    // Origem não permitida: nega sem lançar erro
-    return callback(null, false);
-  },
-  credentials: true,
-});
+  if (allowedOrigins.includes(origin)) {
+    return callback(null, { origin: true, credentials: true });
+  }
 
-export default corsMiddleware;
+  const clientIp = req.ip || req.socket?.remoteAddress || "desconhecido";
+  const method = req.method;
+  const path = req.originalUrl || req.url;
+
+  return callback(
+    new AppError(
+      `Bloqueio de CORS: Origem '${origin}' não autorizada para o IP ${clientIp} em ${method} ${path}.`,
+      403
+    )
+  );
+};
+
+export default cors(corsOptionsDelegate);
