@@ -47,3 +47,40 @@ export const messageIdParamSchema = z.object({
     messageId: uuidV4(),
   }),
 });
+
+// ---------- Tarefas ----------
+
+// A coluna é VARCHAR(255): sem esse limite, um texto maior viraria erro 500 no banco
+const descricaoSchema = () =>
+  requiredString("descricao")
+    .trim()
+    .min(1, { error: "Não pode ser vazio" })
+    .max(255, { error: "Máximo de 255 caracteres" });
+
+const concluidaSchema = () =>
+  z.boolean({ error: "concluida deve ser true ou false" });
+
+export const createTarefaSchema = z.object({
+  body: z.object({
+    descricao: descricaoSchema(),
+    concluida: concluidaSchema().default(false),
+  }),
+});
+
+export const updateTarefaSchema = z.object({
+  body: z
+    .object({
+      descricao: descricaoSchema().optional(),
+      concluida: concluidaSchema().optional(),
+    })
+    .refine(
+      (body) => body.descricao !== undefined || body.concluida !== undefined,
+      { error: "Informe descricao e/ou concluida" },
+    ),
+});
+
+export const tarefaIdParamSchema = z.object({
+  params: z.object({
+    objectId: uuidV4(),
+  }),
+});
