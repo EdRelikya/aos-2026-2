@@ -12,10 +12,11 @@ const getUserByLogin = async (login) => {
   return await models.User.findByLogin(login);
 };
 
-const createUser = async ({ username, email }) => {
+const createUser = async ({ username, email, password }) => {
   return await models.User.create({
     username,
     email,
+    password,
   });
 };
 
@@ -45,4 +46,3 @@ export default {
   updateUser,
   deleteUser,
 };
-

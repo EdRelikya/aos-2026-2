@@ -24,12 +24,25 @@ export const createUserSchema = z.object({
       error: (issue) =>
         issue.input === undefined ? REQUIRED : "Formato de e-mail inválido",
     }),
+    // A senha não recebe trim: espaços também fazem parte dela
+    password: requiredString("password")
+      .min(7, { error: "Mínimo de 7 caracteres" })
+      .max(42, { error: "Máximo de 42 caracteres" }),
   }),
 });
 
 export const userIdParamSchema = z.object({
   params: z.object({
     userId: uuidV4(),
+  }),
+});
+
+export const loginSchema = z.object({
+  body: z.object({
+    login: requiredString("login")
+      .trim()
+      .min(1, { error: "Não pode ser vazio" }),
+    password: requiredString("password").min(1, { error: "Não pode ser vazio" }),
   }),
 });
 

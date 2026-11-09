@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { messageController } from "../controllers/index.js";
-import { validate } from "../middlewares/index.js";
+import { authMiddleware, validate } from "../middlewares/index.js";
 import {
   createMessageSchema,
   messageIdParamSchema,
@@ -14,7 +14,12 @@ router.get(
   validate(messageIdParamSchema),
   messageController.getMessage,
 );
-router.post("/", validate(createMessageSchema), messageController.createMessage);
+router.post(
+  "/",
+  authMiddleware,
+  validate(createMessageSchema),
+  messageController.createMessage,
+);
 router.put(
   "/:messageId",
   validate(messageIdParamSchema),

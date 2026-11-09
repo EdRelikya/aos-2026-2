@@ -15,10 +15,11 @@ const getUser = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-  const { username, email } = req.body || {};
+  const { username, email, password } = req.body || {};
   const user = await userService.createUser({
     username,
     email,
+    password,
   });
   return res.status(201).send(user);
 };

@@ -5,7 +5,6 @@ import models, { sequelize } from "./models/index.js";
 import {
   corsMiddleware,
   logMiddleware,
-  contextMiddleware,
   notFoundMiddleware,
   errorMiddleware,
   limiterMiddleware,
@@ -23,7 +22,6 @@ app.use(limiterMiddleware);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(logMiddleware);
-app.use(contextMiddleware);
 
 // rotas
 app.get("/", (req, res) => {
@@ -61,11 +59,13 @@ if (syncDatabase) {
   startServer();
 }
 
+// Senhas de demonstração: valem só para os dados de exemplo
 const createUsersWithMessages = async () => {
   await models.User.create(
     {
       username: "rwieruch",
       email: "rwieruch@email.com",
+      password: "rwieruch123",
       messages: [
         {
           text: "Published the Road to learn React",
@@ -81,6 +81,7 @@ const createUsersWithMessages = async () => {
     {
       username: "ddavids",
       email: "ddavids@email.com",
+      password: "ddavids123",
       messages: [
         {
           text: "Happy to release ...",
