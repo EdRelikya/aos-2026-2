@@ -46,6 +46,16 @@ export const loginSchema = z.object({
   }),
 });
 
+// Usado no refresh e no logout
+export const refreshTokenSchema = z.object({
+  body: z.object({
+    refreshToken: requiredString("refreshToken")
+      .trim()
+      .min(1, { error: "Não pode ser vazio" })
+      .max(255, { error: "Máximo de 255 caracteres" }),
+  }),
+});
+
 export const createMessageSchema = z.object({
   body: z.object({
     text: requiredString("text")

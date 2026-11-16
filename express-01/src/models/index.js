@@ -4,6 +4,7 @@ import pg from "pg";
 import getUserModel from "./user.js";
 import getMessageModel from "./message.js";
 import getTarefaModel from "./tarefa.js";
+import getRefreshTokenModel from "./refreshToken.js";
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
@@ -14,6 +15,7 @@ const models = {
   User: getUserModel(sequelize, Sequelize),
   Message: getMessageModel(sequelize, Sequelize),
   Tarefa: getTarefaModel(sequelize, Sequelize),
+  RefreshToken: getRefreshTokenModel(sequelize, Sequelize),
 };
 
 Object.keys(models).forEach((key) => {
